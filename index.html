@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.css" />
+    <style>
+        #map {
+            width: 1000px;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.js"></script>
+
+    <div id="map"></div>
+
+    <script>
+        let tiles = new L.tileLayer('https://maps-{s}.onemap.sg/v3/Default/{z}/{x}/{y}.png', {
+            detectRetina: true,
+            maxZoom: 20,
+            //minZoom: 5,
+            //Do not remove this attribution
+            attribution: '<img src="https://docs.onemap.sg/maps/images/oneMap64-01.png" style="height:20px;width:20px;">' +
+                'New OneMap | Map data © contributors, <a href="http://SLA.gov.sg">Singapore Land Authority</a>'
+        });
+
+        let map = new L.Map("map", {
+            center: [1.347833, 103.809357],
+            zoom: 12,
+            maxBounds: L.latLngBounds(L.latLng(1.1, 103.5), L.latLng(1.5, 104.3))
+        })
+        .addLayer(tiles);
+
+
+        async function getPSIdata() {
+            let response = await fetch('https://api.data.gov.sg/v1/environment/psi');
+            let data = await response.json();
+            let read = data.items[0].read
+            console.log(read)
+
+            var circleWest = L.circle([1.35735, 103.7], {
+                color: 'tred',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 2000
+            }).addTo(map);
+            circleWest.bindPopup(read['psi_twenty_four_hourly'].west.toString());
+
+            var circleEast = L.circle([1.35735, 103.94], {
+                color: 'tred',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 2000
+            }).addTo(map);
+            circleEast.bindPopup(read['psi_twenty_four_hourly'].east.toString());
+
+            var circleCentral = L.circle([1.35735, 103.82], {
+                color: 'tred',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 2000
+            }).addTo(map);
+            circleCentral.bindPopup(read['psi_twenty_four_hourly'].central.toString());
+
+            var circleNorth = L.circle([1.41803, 103.82], {
+                color: 'tred',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 2000
+            }).addTo(map);
+            circleNorth.bindPopup(read['psi_twenty_four_hourly'].north.toString());
+
+            var circleSouth = L.circle([1.29587, 103.82], {
+                color: 'tred',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 2000
+            }).addTo(map);
+            circleSouth.bindPopup(read['psi_twenty_four_hourly'].south.toString());
+        };
+        getPSIdata();
+    </script>
+</body>
+</html>
